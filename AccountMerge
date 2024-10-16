@@ -1,0 +1,61 @@
+class Solution {
+    int parent[];
+    int rank[];
+    public int find(int x){
+        if(x==parent[x]){
+            return x;
+        }return find(parent[x]);
+    }
+    public void union(int x,int y){
+        int parX=find(x);
+        int parY=find(y);
+        if(parX==parY){
+            return;
+        }
+        if(rank[parX]<rank[parY]){
+            parent[parX]=parY;
+        }
+        else if(rank[parX]>rank[parY]){
+            parent[parY]=parX;
+        }else{
+             parent[parY]=parX;
+             rank[parX]++;
+        }
+    }
+    public List<List<String>> accountsMerge(List<List<String>> accounts) {
+        int n = accounts.size();
+        parent = new int[n];
+        rank = new int[n];
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+            rank[i] = 0;
+        }
+        Map<String,Integer> map = new HashMap<>();
+        for (int i = 0; i < n; i++) {
+            for (int j = 1; j < accounts.get(i).size(); j++) {
+                String email=accounts.get(i).get(j);
+                if(!map.containsKey(email)){
+                    map.put(email,i);
+                }else{
+                    union(i,map.get(email));
+                }
+            }
+        }
+        Map<Integer,List<String>>indexMap=new HashMap<>();
+        for(String email:map.keySet()){
+            int index=find(map.get(email));
+            indexMap.putIfAbsent(index,new ArrayList<>());
+            indexMap.get(index).add(email);
+        }
+        List<List<String>>merge=new ArrayList<>();
+        for(int index:indexMap.keySet()){
+            List<String> emails = indexMap.get(index);
+            Collections.sort(emails);
+            List<String>account=new ArrayList<>();
+            account.add(accounts.get(index).get(0));
+            account.addAll(emails);
+            merge.add(account);
+        }
+        return merge;
+    }
+}
