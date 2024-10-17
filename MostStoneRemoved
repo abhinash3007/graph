@@ -1,0 +1,51 @@
+class Solution {
+    int[] parent;
+    int[] rank;
+
+    public int find(int x) {
+        if (x == parent[x]) {
+            return x;
+        }
+        return parent[x] = find(parent[x]);
+    }
+
+    public void union(int x, int y) {
+        int parX = find(x);
+        int parY = find(y);
+        if (parX == parY) {
+            return;
+        }
+        if (rank[parX] < rank[parY]) {
+            parent[parX] = parY;
+        } else if (rank[parX] > rank[parY]) {
+            parent[parY] = parX;
+        } else {
+            parent[parY] = parX;
+            rank[parX]++;
+        }
+    }
+
+    public int removeStones(int[][] stones) {
+        int n = stones.length;
+        parent = new int[n];
+        rank = new int[n];
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+            rank[i] = 0;
+        }
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (stones[i][0] == stones[j][0] || stones[i][1] == stones[j][1]){
+                    union(i, j);
+                }
+            }
+        }
+        int count = 0;
+        for (int i = 0; i < n; i++) {
+            if (parent[i] == i) {
+                count++;
+            }
+        }
+        return n - count;
+    }
+}
