@@ -1,0 +1,52 @@
+class Solution
+{
+    public int kosaraju(int v, ArrayList<ArrayList<Integer>> adj)
+    {
+        Stack<Integer>s=new Stack<>();
+        boolean[]visited=new boolean[v];
+        for (int i = 0; i < v; i++) {
+            if(!visited[i]){
+                dfs(i,adj,visited,s);
+            }
+        }
+        ArrayList<ArrayList<Integer>>reverse=new ArrayList<>();
+        for(int i=0;i<v;i++){
+            reverse.add(new ArrayList<>());
+        }
+        for(int i=0;i<adj.size();i++){
+            for(int j=0;j<adj.get(i).size();j++){
+                int neighbour=adj.get(i).get(j);
+                reverse.get(neighbour).add(i);
+            }
+        }
+        int count=0;
+        Arrays.fill(visited,false);
+        while(!s.isEmpty()){
+            int curr=s.pop();
+            if(!visited[curr]){
+                dfs2(curr,reverse,visited);
+                count++;
+            }
+        }
+        return count;
+    }
+    public void dfs(int start,ArrayList<ArrayList<Integer>>adj,boolean[]visited,Stack<Integer>s){
+        visited[start]=true;
+        for(int i=0;i<adj.get(start).size();i++){
+            int neighbour=adj.get(start).get(i);
+            if(!visited[neighbour]){
+                dfs(neighbour,adj,visited,s);
+            }
+        }
+        s.push(start);
+    }
+    public void dfs2(int start,ArrayList<ArrayList<Integer>>reverse,boolean[]visited){
+        visited[start]=true;
+        for(int i=0;i<reverse.get(start).size();i++){
+            int neighbour=reverse.get(start).get(i);
+            if(!visited[neighbour]){
+                dfs2(neighbour,reverse,visited);
+            }
+        }
+    }
+}
