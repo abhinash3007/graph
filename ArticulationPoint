@@ -1,0 +1,65 @@
+import java.util.*;
+
+class Solution {
+    private int time = 0;  
+
+    public List<Integer> articulationPoints(int n, List<List<Integer>> connections) {
+        List<List<Integer>> adj = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            adj.add(new ArrayList<>());
+        }
+
+        for (List<Integer> conn : connections) {
+            adj.get(conn.get(0)).add(conn.get(1));
+            adj.get(conn.get(1)).add(conn.get(0));
+        }
+
+        boolean[] visited = new boolean[n];
+        int[] discovery = new int[n];
+        int[] low = new int[n];
+        boolean[] isArticulationPoint = new boolean[n]; 
+        int[] parent = new int[n];
+        Arrays.fill(parent, -1);  
+
+        for (int i = 0; i < n; i++) {
+            if (!visited[i]) {
+                dfs(i, visited, discovery, low, parent, isArticulationPoint, adj);
+            }
+        }
+
+        List<Integer> result = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            if (isArticulationPoint[i]) {
+                result.add(i);
+            }
+        }
+
+        return result;
+    }
+
+    private void dfs(int u, boolean[] visited, int[] discovery, int[] low, int[] parent, boolean[] isArticulationPoint, List<List<Integer>> adj) {
+        visited[u] = true;
+        discovery[u] = low[u] = ++time;  
+        int children = 0;  
+
+        for (int v : adj.get(u)) {
+            if (!visited[v]) {  
+                children++;
+                parent[v] = u;
+                dfs(v, visited, discovery, low, parent, isArticulationPoint, adj);
+
+                low[u] = Math.min(low[u], low[v]);
+
+                if (parent[u] == -1 && children > 1) {
+                    isArticulationPoint[u] = true;
+                }
+
+                if (parent[u] != -1 && low[v] >= discovery[u]) {
+                    isArticulationPoint[u] = true;
+                }
+            } else if (v != parent[u]) {
+                low[u] = Math.min(low[u], discovery[v]);
+            }
+        }
+    }
+}
